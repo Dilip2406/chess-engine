@@ -266,6 +266,8 @@ U64 mask_bishop_attacks(int square)
 
 }
 
+
+
 //mask rook attacks
 U64 mask_rook_attacks(int square)
 {
@@ -282,6 +284,87 @@ U64 mask_rook_attacks(int square)
     for( r=tr-1 ;r>=1;r--) attacks |= (1ULL << (r*8+tf));
     for( f=tf+1;f<=6;f++) attacks |= (1ULL << (tr*8+f));
     for( f=tf-1 ;f>=1;f--) attacks |= (1ULL << (tr*8+f));
+
+
+    return attacks;
+}
+
+//generate bishop attacks on the fly
+
+U64 bishop_attacks_on_the_fly(int square, U64 block)
+{
+    //result attacks bitboard
+    U64 attacks=0ULL;
+
+    int r,f;
+
+    int tr=square/8;
+    int tf=square%8;
+
+    //generate bishop attacks
+    for( r=tr+1 ,f=tf+1;r<=7 &&f<=7;r++,f++) 
+    {
+        attacks |= (1ULL << (r*8+f));
+        if(get_bit(block,r*8+f)) break;
+    
+    }
+    for( r=tr-1 ,f=tf+1;r>=0 &&f<=7;r--,f++) 
+     {
+        attacks |= (1ULL << (r*8+f));
+        if(get_bit(block,r*8+f)) break;
+    
+    }
+    for( r=tr+1 ,f=tf-1;r<=7 &&f>=0;r++,f--) 
+     {
+        attacks |= (1ULL << (r*8+f));
+        if(get_bit(block,r*8+f)) break;
+    
+    }
+    for( r=tr-1 ,f=tf-1;r>=0 &&f>=0;r--,f--) 
+     {
+        attacks |= (1ULL << (r*8+f));
+        if(get_bit(block,r*8+f)) break;
+    
+    }
+
+
+    return attacks;
+
+}
+
+//generate rook on the fly attack function
+U64 rook_attacks_on_the_fly(int square,U64 block)
+{
+    //result attacks bitboard
+    U64 attacks=0ULL;
+
+    int r,f;
+
+    int tr=square/8;
+    int tf=square%8;
+
+    //mask relevant occupancy bits
+    for( r=tr+1 ;r<=7;r++) 
+    {
+        attacks |= (1ULL << (r*8+tf));
+        if(get_bit(block,r*8+tf)) break;
+
+    }
+    for( r=tr-1 ;r>=0;r--) 
+    {
+        attacks |= (1ULL << (r*8+tf));
+        if(get_bit(block,r*8+tf)) break;
+    }
+    for( f=tf+1;f<=7;f++) 
+    {
+        attacks |= (1ULL << (tr*8+f));
+        if(get_bit(block,tr*8+f)) break;
+    }
+    for( f=tf-1 ;f>=0;f--) 
+     {
+        attacks |= (1ULL << (tr*8+f));
+        if(get_bit(block,tr*8+f)) break;
+    }
 
 
     return attacks;
@@ -317,9 +400,18 @@ int main()
     init_leaper_attacks();
 
     //loop over 64 board squares
-   for(int square=0;square<64;square++)
-     print_bitboard(mask_rook_attacks(square));
+ //  for(int square=0;square<64;square++)
+   //  print_bitboard(mask_rook_attacks(square));
+   //init occupancy bitboard
+   U64 block=0ULL;
+   set_bit(block,c4);
+   set_bit(block,e4);
+   set_bit(block,d3);
+   set_bit(block,d5);
+   print_bitboard(block);
 
+
+print_bitboard(rook_attacks_on_the_fly(d4,block));
 
    
     return 0;
