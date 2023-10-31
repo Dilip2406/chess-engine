@@ -11,6 +11,42 @@
 
 #define set_bit(bitboard,square) bitboard |= (1ULL << square)
 
+//bit count routine brian kernighan's algorithm
+static inline int count_bits(U64 bitboard)
+{
+    //bit count
+    int count=0;
+
+    //consecutively reset least significant 1st bit
+    while(bitboard)
+    {
+        //increment count
+        count++;
+
+        //pop least significant bit
+        bitboard &=bitboard -1;
+    }
+
+    //return count
+    return count;
+}
+
+//get least significant 1st bit index
+static inline int get_ls1b_index(U64 bitboard)
+{
+    //make sure bitboard is not 0
+    if(bitboard)
+    {
+        //count trailing bits before least significant 1st bit
+        return count_bits((bitboard & -bitboard)-1);
+    }
+    //otherwise
+    else
+    //return illegal index
+    return -1;
+}
+
+
 //enum board squares
 enum {
     a8, b8, c8, d8, e8, f8, g8, h8,
@@ -29,8 +65,7 @@ enum { white ,black};
 
 
 
-/*
-
+const char *square_to_coordinates[]={
  "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
  "a7", "b7", "c7", "d7", "e7", "f7", "g7", "h7",
  "a6", "b6", "c6", "d6", "e6", "f6", "g6", "h6",
@@ -40,7 +75,7 @@ enum { white ,black};
  "a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2",
  "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"
 
-*/
+};
 
 //print bitboard
 void print_bitboard(U64 bitboard)
@@ -332,7 +367,7 @@ U64 bishop_attacks_on_the_fly(int square, U64 block)
 
 }
 
-//generate rook on the fly attack function
+//generate rook attacks on the fly function
 U64 rook_attacks_on_the_fly(int square,U64 block)
 {
     //result attacks bitboard
@@ -408,11 +443,13 @@ int main()
    set_bit(block,e4);
    set_bit(block,d3);
    set_bit(block,d5);
+   set_bit(block,c7);
    print_bitboard(block);
 
 
-print_bitboard(rook_attacks_on_the_fly(d4,block));
+    printf("index %d ,coordinate : %s \n",get_ls1b_index(block),square_to_coordinates[get_ls1b_index(block)]);
 
+    
    
     return 0;
 }
