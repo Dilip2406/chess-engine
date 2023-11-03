@@ -11,6 +11,54 @@
 
 #define set_bit(bitboard,square) bitboard |= (1ULL << square)
 
+
+/*                   Random numbers                  */
+
+
+//pseudo random number state
+unsigned int state=1804289383;
+
+//generate 32 bit  pseudo legal numbers
+unsigned int get_random_U32number()
+{
+    //xorshift algorithm
+    unsigned int x=state;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    //update random number state
+    state=x;
+
+    //return random number
+    return x;
+}
+
+//generate 64 bit pseudo legal numbers
+U64 get_random_U64number()
+{
+    //define 4 random numbers
+    U64 n1,n2,n3,n4;
+
+    //init random numbers slicing 16 bits from ms1b side
+    n1=(U64)(get_random_U32number() & 0xFFFF);
+    n2=(U64)(get_random_U32number() & 0xFFFF);
+    n3=(U64)(get_random_U32number() & 0xFFFF);
+    n4=(U64)(get_random_U32number() & 0xFFFF);
+
+    //return random number
+
+    return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
+
+
+}
+
+//generate magic number candidate
+U64 generate_magic_number()
+{
+    return get_random_U64number() & get_random_U64number() & get_random_U64number() ;
+}
+
+
 //bit count routine brian kernighan's algorithm
 static inline int count_bits(U64 bitboard)
 {
@@ -478,39 +526,16 @@ U64 set_occupancy(int index,int bits_in_mask,U64 attack_mask)
 
 //main driver
 
-//pseudo random number state
-unsigned int state=1804289383;
-
-//generate 32 bit  pseudo legal numbers
-unsigned int get_random_number()
-{
-    //xorshift algorithm
-    unsigned int x=state;
-    x ^= x << 13;
-    x ^= x >> 17;
-    x ^= x << 5;
-    //update random number state
-    state=x;
-
-    //return random number
-    return x;
-}
-
 int main()
 {   
 
     //init leaper pieces attack
     init_leaper_attacks();
 
-   printf("%ud \n",get_random_number());
-    printf("%ud \n",get_random_number());
-       printf("%ud \n",get_random_number());
-
-   printf("%ud \n",get_random_number());
-
-   printf("%ud \n",get_random_number());
-
-    
+   print_bitboard((U64)get_random_U32number());
+   print_bitboard((U64)get_random_U32number() & 0xFFFF); //slice upper  (from ms1b side) 16 bits
+    print_bitboard(get_random_U64number());
+    print_bitboard(generate_magic_number());
    
     return 0;
 }
