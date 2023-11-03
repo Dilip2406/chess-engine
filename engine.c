@@ -180,6 +180,31 @@ const U64 not_hg_file=4557430888798830399ULL;
 //not AB file constant 
 U64 not_ab_file=18229723555195321596ULL;
 
+//relevant occupancy bit count for every square on board
+const int bishop_relevant_bits[64]={
+ 6, 5, 5, 5, 5, 5, 5, 6,
+ 5, 5, 5, 5, 5, 5, 5, 5,
+ 5, 5, 7, 7, 7, 7, 5, 5,
+ 5, 5, 7, 9, 9, 7, 5, 5,
+ 5, 5, 7, 9, 9, 7, 5, 5,
+ 5, 5, 7, 7, 7, 7, 5, 5,
+ 5, 5, 5, 5, 5, 5, 5, 5,
+ 6, 5, 5, 5, 5, 5, 5, 6
+};
+
+const int rook_relevant_bits[64]={
+ 12, 11, 11, 11, 11, 11, 11, 12,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 11, 10, 10, 10, 10, 10, 10, 11,
+ 12, 11, 11, 11, 11, 11, 11, 12
+};
+
+
+
 //pawn attacks table [side][square]
 U64 pawn_attacks[2][64];
 
@@ -452,29 +477,38 @@ U64 set_occupancy(int index,int bits_in_mask,U64 attack_mask)
 
 
 //main driver
+
+//pseudo random number state
+unsigned int state=1804289383;
+
+//generate 32 bit  pseudo legal numbers
+unsigned int get_random_number()
+{
+    //xorshift algorithm
+    unsigned int x=state;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    //update random number state
+    state=x;
+
+    //return random number
+    return x;
+}
+
 int main()
 {   
 
     //init leaper pieces attack
     init_leaper_attacks();
 
-    //mask piece attack at given square
-    U64 attack_mask=mask_rook_attacks(d4);
+   printf("%ud \n",get_random_number());
+    printf("%ud \n",get_random_number());
+       printf("%ud \n",get_random_number());
 
-    print_bitboard(attack_mask);
-    //loop for occupancy indices;
-    for(int index=0;index<4096;index++)
-    {
-        //get occupancy bitboard
-        U64 occupancy=set_occupancy(index,count_bits(attack_mask),attack_mask);
+   printf("%ud \n",get_random_number());
 
-        //print occupancy bitboard
-        print_bitboard(occupancy);
-
-        getchar();
-    }
-   
-
+   printf("%ud \n",get_random_number());
 
     
    
